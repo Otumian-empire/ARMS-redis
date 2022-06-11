@@ -1,0 +1,29 @@
+{
+  "name": "es6-blank-template",
+  "version": "1.0.0",
+  "description": "This is a starter template for a simple es6 project using babel for transpiling with prettier and eslint configuration.",
+  "main": "./src/index.js",
+  "scripts": {
+    "build": "babel ./src --out-dir build",
+    "dev": "nodemon",
+    "start": "node src/index.js",
+    "format": "npx prettier --write ./src",
+    "check": "npx prettier --check ./src",
+    "lint": "npx eslint ./src"
+  },
+  "keywords": [
+    "es6",
+    "template",
+    "es6-start-template"
+  ],
+  "type": "module",
+  "author": "https://github.com/Open-Source-Ghana",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.17.10",
+    "@babel/core": "^7.18.2",
+    "@babel/preset-env": "^7.18.2",
+    "eslint": "^8.17.0",
+    "prettier": "2.6.2"
+  }
+}
