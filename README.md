@@ -1,3 +1,3 @@
-# es6-blank-template
+# ARMS - Ashita Rent Management System
 
-This is a starter template for a simple es6 project using babel for transpiling with prettier and eslint configuration.
+Look into `old-README.md` for the description. This repository use the redis stack instead of mongodb.
