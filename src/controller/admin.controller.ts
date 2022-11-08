@@ -1,0 +1,193 @@
+import { compare, hash } from "bcrypt";
+import { JWTAuthentication as Auth } from "../authentication";
+// import { Cache } from "../caching/index.js";
+import logger from "../config/logger.js";
+import { Admin } from "../db/index.js";
+import {
+  ADMIN_CREATED_SUCCESSFULLY,
+  AN_ERROR_OCCURRED,
+  DELETED_SUCCESSFULLY,
+  INVALID_CREDENTIALS,
+  LOGIN_SUCCESSFUL,
+  NOT_FOUND,
+  UPDATE_SUCCESSFUL
+} from "../util/api.message.js";
+import { REDIS_TTL, rounds } from "../util/app.constant.js";
+
+// `admin.auth.js`
+// there is a `req.id` that is part of the payload passed by the `admin.auth.js`
+// middleware. we can further use this req.id to check if the admin making the
+// request (user) and admin made the request on (resource) correspond
+// (user->resource). We can use this to restrict one admin from accessing
+// another's data
+
+export default class AdminController {
+  // static async findById(req, res) {
+  //   try {
+  //     const id = req.params.id;
+
+  //     const admin = await Admin.findById(id).select("-password -__v");
+
+  //     if (!admin) {
+  //       return res.json({
+  //         success: false,
+  //         message: NOT_FOUND
+  //       });
+  //     }
+
+  //     const redisKey = `ADMIN:${id}`;
+  //     await Cache.setEx(redisKey, REDIS_TTL, JSON.stringify(admin));
+
+  //     return res.json(admin);
+  //   } catch (error) {
+  //     logger.error(error.message);
+
+  //     return res.json({
+  //       success: false,
+  //       message: error.message
+  //     });
+  //   }
+  // }
+
+  static async create(req, res) {
+    try {
+      const { username, password, email } = req.body;
+      const hashedPassword = await hash(password, rounds);
+
+      let admin = Admin.createEntity({
+        username,
+        email,
+        password: hashedPassword
+      });
+
+      const id = await Admin.save(admin);
+
+      return res.json({
+        success: true,
+        message: ADMIN_CREATED_SUCCESSFULLY,
+        id: id
+      });
+    } catch (error) {
+      logger.error(error.message);
+      console.log(error)
+
+      return res.json({
+        success: false,
+        message: AN_ERROR_OCCURRED
+      });
+    }
+  }
+
+  // static async login(req, res) {
+  //   try {
+  //     const { username, password } = req.body;
+  //     const result = await Admin.findOne({ username });
+
+  //     if (!result) {
+  //       return res.json({
+  //         success: false,
+  //         message: NOT_FOUND
+  //       });
+  //     }
+
+  //     const same = await compare(password, result.password);
+
+  //     if (!same) {
+  //       return res.json({
+  //         success: false,
+  //         message: INVALID_CREDENTIALS
+  //       });
+  //     }
+
+  //     const token = await Auth.generateJWT({
+  //       id: result.id,
+  //       username: result.username,
+  //       email: result.email
+  //     });
+
+  //     return res.json({
+  //       success: true,
+  //       message: LOGIN_SUCCESSFUL,
+  //       id: result.id,
+  //       auth: token
+  //     });
+  //   } catch (error) {
+  //     logger.error(error.message);
+
+  //     return res.json({
+  //       success: false,
+  //       message: error.message
+  //     });
+  //   }
+  // }
+
+  // static async update(req, res) {
+  //   try {
+  //     const id = req.params.id;
+  //     const email = req.body.email;
+
+  //     const result = await Admin.findById(id);
+
+  //     if (!result) {
+  //       return res.json({
+  //         success: false,
+  //         message: NOT_FOUND
+  //       });
+  //     }
+
+  //     if (email) {
+  //       result.email = email;
+  //     }
+
+  //     const updatedResult = await result.save();
+
+  //     if (!updatedResult) {
+  //       return res.json({
+  //         success: false,
+  //         message: AN_ERROR_OCCURRED
+  //       });
+  //     }
+
+  //     return res.json({
+  //       success: true,
+  //       message: UPDATE_SUCCESSFUL,
+  //       id: updatedResult.id
+  //     });
+  //   } catch (error) {
+  //     logger.error(error.message);
+
+  //     return res.json({
+  //       success: false,
+  //       message: error.message
+  //     });
+  //   }
+  // }
+
+  // static async delete_(req, res) {
+  //   try {
+  //     const id = req.params.id;
+
+  //     const result = await Admin.findByIdAndDelete(id);
+
+  //     if (!result) {
+  //       return res.json({
+  //         success: false,
+  //         message: NOT_FOUND
+  //       });
+  //     }
+
+  //     return res.json({
+  //       success: true,
+  //       message: DELETED_SUCCESSFULLY,
+  //       id: result.id
+  //     });
+  //   } catch (error) {
+  //     logger.error(error.message);
+
+  //     return res.json({
+  //       success: false,
+  //       message: error.message
+  //     });
+  //   }
+  // }
+}
